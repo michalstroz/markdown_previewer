@@ -51,7 +51,7 @@ And here. | Okay. | I think we get it.
 document.addEventListener('DOMContentLoaded', () => {
     const editor = document.querySelector('#editor');
     editor.value = placeHolder;
-    const replacer = new Index();
+    const replacer = new Replacer();
 
     replacer.addBlockElementsToPrev(editor.value);
     write(editor, replacer);
@@ -62,7 +62,7 @@ function write(input, obj) {
 }
 
 
-function Index() {
+function Replacer() {
     this.previewer = document.querySelector('#previewer');
     this.blockPatterns = {
         heading1: /^#.+$/,
@@ -101,7 +101,7 @@ function Index() {
     };
 }
 
-Index.prototype.divideTextToBlockElements = function (text) {
+Replacer.prototype.divideTextToBlockElements = function (text) {
     const array = text.match(/.+|\n+/g);
     let i = 0;
     this.arr = [];
@@ -126,7 +126,7 @@ Index.prototype.divideTextToBlockElements = function (text) {
 
 };
 
-Index.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
+Replacer.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
     const subArr = [arr[idx]];
     let j = idx + 1;
 
@@ -161,7 +161,7 @@ Index.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
     return j;
 };
 
-Index.prototype.addBlockElementsToPrev = function (text) {
+Replacer.prototype.addBlockElementsToPrev = function (text) {
 
     while (this.previewer.firstChild) {
         this.previewer.firstChild.remove();
@@ -193,7 +193,7 @@ Index.prototype.addBlockElementsToPrev = function (text) {
     }
 };
 
-Index.prototype.createBlockTxtElement = function (idx, tag) {
+Replacer.prototype.createBlockTxtElement = function (idx, tag) {
     const element = document.createElement(tag);
     let str = this.arr[idx];
 
@@ -215,7 +215,7 @@ Index.prototype.createBlockTxtElement = function (idx, tag) {
     this.previewer.appendChild(element);
 };
 
-Index.prototype.setImgElement = function (idx) {
+Replacer.prototype.setImgElement = function (idx) {
     const str = this.arr[idx];
     const src = str.slice(str.indexOf('(') + 1, str.indexOf(')')).trim();
     const alt = str.slice(str.indexOf('[') + 1, str.indexOf(']')).trim();
@@ -233,7 +233,7 @@ Index.prototype.setImgElement = function (idx) {
     this.previewer.appendChild(div);
 };
 
-Index.prototype.setBlockCode = function (idx) {
+Replacer.prototype.setBlockCode = function (idx) {
     let str = this.arr[idx];
     str = str.slice(3, str.length - 3).trim();
     const content = document.createTextNode(str);
@@ -247,7 +247,7 @@ Index.prototype.setBlockCode = function (idx) {
     this.previewer.appendChild(pre);
 };
 
-Index.prototype.setOrderedList = function (idx) {
+Replacer.prototype.setOrderedList = function (idx) {
     let str = this.arr[idx];
     const listArr = str.split('\n').filter(v => v.trim() !== '');
     const orderedList = document.createElement('ol');
@@ -266,7 +266,7 @@ Index.prototype.setOrderedList = function (idx) {
     this.previewer.appendChild(orderedList);
 };
 
-Index.prototype.setUnorderedList = function (idx) {
+Replacer.prototype.setUnorderedList = function (idx) {
     let strArr = this.arr[idx].split('\n').filter(v => v.trim() !== '');
     let i = 0;
 
@@ -285,7 +285,7 @@ Index.prototype.setUnorderedList = function (idx) {
                 const li = document.createElement('li');
                 const content = document.createTextNode(data);
                 li.appendChild(content);
-                Index.prototype.setInlineElement(li);
+                Replacer.prototype.setInlineElement(li);
                 parent.appendChild(li);
                 i++;
             } else {
@@ -302,7 +302,7 @@ Index.prototype.setUnorderedList = function (idx) {
     })(-1);
 };
 
-Index.prototype.setTable = function(idx) {
+Replacer.prototype.setTable = function(idx) {
     const arr = this.arr[idx].split('\n');
     const table = document.createElement('table');
     table.className = this.classNames['table'];
@@ -333,7 +333,7 @@ Index.prototype.setTable = function(idx) {
     this.previewer.appendChild(table);
 };
 
-Index.prototype.setInlineElement = function (element) {
+Replacer.prototype.setInlineElement = function (element) {
     let txt = element.innerHTML;
 
     txt = txt.replace(/`.+`/g, (match) => {
