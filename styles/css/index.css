@@ -1,0 +1,32 @@
+.editorWrapper .text-editor, body {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  font-size: 10px;
+  width: 100%;
+}
+
+.content {
+  width: 90%;
+  margin: auto;
+  padding-top: 3em;
+}
+
+.editorWrapper {
+  height: 40vh;
+  margin-bottom: 3em;
+}
+.editorWrapper .text-editor {
+  background: linear-gradient(135deg, #fdfdfd, #d9d9d9);
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: none;
+  box-sizing: border-box;
+  padding: 1em;
+  box-shadow: 0 0 0.2em #9f9f9f;
+}
+
+/*# sourceMappingURL=index.css.map */

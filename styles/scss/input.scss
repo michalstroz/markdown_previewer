@@ -1,0 +1,40 @@
+@import "partials/variables", "partials/mixins";
+
+%reset-margin-padding {
+  margin: $zero-margin;
+  padding: $zero-padding;
+}
+
+body {
+  @extend %reset-margin-padding;
+}
+.container {
+  font-size: $font-size;
+  width: $full-width;
+}
+.content {
+  width: $full-width - 10%;
+  margin: $auto-margin;
+  padding-top: $zero-padding + 3em;
+}
+.editorWrapper {
+  height: $full-screen-height - 60;
+  margin-bottom: $zero-margin + 3em;
+
+  .text-editor {
+    @extend %reset-margin-padding;
+    @include gradient(135deg, #fdfdfd, #d9d9d9);
+    width: $full-width;
+    height: $full-height;
+    resize: $not-resize;
+    border: $remove-border;
+    box-sizing: $border-box-sizing;
+    padding: $zero-padding + 1em;
+    box-shadow: $editor-shadow;
+  }
+}
+
+.preview {
+  
+}
+
