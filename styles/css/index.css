@@ -3,6 +3,26 @@
   padding: 0;
 }
 
+.preview .previewerUnorderedList, .preview .previewerOrderedList, .preview .previewerTable, .preview .previewerBlockQuote, .preview .previewerMultiLineCode, .preview .previewerParagraph {
+  font-size: 1.3em;
+  margin: 1.3em 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.preview .inlineCode, .preview .previewerMultiLineCode {
+  color: #ffffff;
+  background: linear-gradient(160deg, #555, #000);
+}
+
+.preview .previewerTable td, .preview .previewerTable th, .preview .previewerTable {
+  border: 1px solid #000;
+}
+
+body {
+  overflow-x: hidden;
+}
+
 .container {
   font-size: 10px;
   width: 100%;
@@ -27,6 +47,36 @@
   box-sizing: border-box;
   padding: 1em;
   box-shadow: 0 0 0.2em #9f9f9f;
+}
+
+.preview .previewerMainHeading {
+  margin: 1.3em 0;
+  font-size: 2.9em;
+}
+.preview .previewerSecondHeading {
+  margin: 1.3em 0;
+  font-size: 2.1em;
+}
+.preview .previewerThirdHeading {
+  margin: 1.3em 0;
+  font-size: 1.5717em;
+}
+.preview .previewerParagraph {
+  margin: 0.5em 0;
+}
+.preview .previewerMultiLineCode {
+  padding: 1em;
+  overflow-x: auto;
+}
+.preview .previewerUnorderedList {
+  font-size: 1rem;
+  margin: 0;
+}
+.preview .previewerImage {
+  width: 100%;
+}
+.preview .inlineCode {
+  padding: 0 0.2em;
 }
 
 /*# sourceMappingURL=index.css.map */
