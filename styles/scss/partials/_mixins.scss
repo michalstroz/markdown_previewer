@@ -1,3 +1,13 @@
 @mixin gradient($deg, $color1, $color2) {
   background: linear-gradient($deg, $color1, $color2);
 }
+
+@mixin overflow($dir, $val) {
+  @if $dir == x {
+    overflow-x: $val;
+  } @else if $dir == y {
+    overflow-y: $val;
+  } @else {
+    overflow: $val;
+  }
+}
