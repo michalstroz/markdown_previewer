@@ -63,7 +63,7 @@ function write(input, obj) {
 
 
 function Replacer() {
-    this.previewer = document.querySelector('#previewer');
+    this.preview = document.querySelector('#preview');
     this.blockPatterns = {
         heading1: /^#.+$/,
         heading2: /^#{2}.+$/,
@@ -163,8 +163,8 @@ Replacer.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
 
 Replacer.prototype.addBlockElementsToPrev = function (text) {
 
-    while (this.previewer.firstChild) {
-        this.previewer.firstChild.remove();
+    while (this.preview.firstChild) {
+        this.preview.firstChild.remove();
     }
 
     this.divideTextToBlockElements(text);
@@ -212,7 +212,7 @@ Replacer.prototype.createBlockTxtElement = function (idx, tag) {
     element.id = 'previewerBlockElement-' + idx;
     element.appendChild(content);
     this.setInlineElement(element);
-    this.previewer.appendChild(element);
+    this.preview.appendChild(element);
 };
 
 Replacer.prototype.setImgElement = function (idx) {
@@ -230,7 +230,7 @@ Replacer.prototype.setImgElement = function (idx) {
     img.alt = alt;
 
     div.appendChild(img);
-    this.previewer.appendChild(div);
+    this.preview.appendChild(div);
 };
 
 Replacer.prototype.setBlockCode = function (idx) {
@@ -244,7 +244,7 @@ Replacer.prototype.setBlockCode = function (idx) {
     pre.className = this.classNames['pre'];
     pre.id = 'previewerBlockElement-' +  idx;
     pre.appendChild(code);
-    this.previewer.appendChild(pre);
+    this.preview.appendChild(pre);
 };
 
 Replacer.prototype.setOrderedList = function (idx) {
@@ -263,14 +263,14 @@ Replacer.prototype.setOrderedList = function (idx) {
         orderedList.appendChild(li);
     });
 
-    this.previewer.appendChild(orderedList);
+    this.preview.appendChild(orderedList);
 };
 
 Replacer.prototype.setUnorderedList = function (idx) {
     let strArr = this.arr[idx].split('\n').filter(v => v.trim() !== '');
     let i = 0;
 
-    (function createList(depth, parent = this.previewer) {
+    (function createList(depth, parent = this.preview) {
         while (i < strArr.length) {
             const [whiteSigns, data] = strArr[i].split('- ');
             const whiteSignsLength = whiteSigns.length;
@@ -289,7 +289,7 @@ Replacer.prototype.setUnorderedList = function (idx) {
                 parent.appendChild(li);
                 i++;
             } else {
-                if (parent !== this.previewer) {
+                if (parent !== this.preview) {
                     parent = parent.lastChild;
                 }
 
@@ -330,7 +330,7 @@ Replacer.prototype.setTable = function(idx) {
         }
         table.appendChild(tableRow);
     }
-    this.previewer.appendChild(table);
+    this.preview.appendChild(table);
 };
 
 Replacer.prototype.setInlineElement = function (element) {
