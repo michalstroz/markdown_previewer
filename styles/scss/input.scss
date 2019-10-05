@@ -50,7 +50,7 @@ body {
   }
 }
 
-.preview {
+.previewer {
   .previewerMainHeading {
     margin: $block-element-margin;
     font-size: $heading-font-size;
@@ -142,7 +142,7 @@ body {
   .editorWrapper {
     @extend %set-content-children-dimensions;
   }
-  .preview {
+  .previewer {
     @extend %set-content-children-dimensions;
     @include overflow(y, auto);
     padding: $zero-padding $zero-padding + 3em;

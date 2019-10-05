@@ -3,18 +3,18 @@
   padding: 0;
 }
 
-.preview .previewerImageWrapper, .preview > .previewerUnorderedList, .preview .previewerOrderedList, .preview .previewerTable, .preview .previewerBlockQuote, .preview .previewerMultiLineCode, .preview .previewerParagraph {
+.previewer .previewerImageWrapper, .previewer > .previewerUnorderedList, .previewer .previewerOrderedList, .previewer .previewerTable, .previewer .previewerBlockQuote, .previewer .previewerMultiLineCode, .previewer .previewerParagraph {
   font-size: 1.3em;
   margin: 1.3em 0;
   box-sizing: border-box;
 }
 
-.preview .inlineCode, .preview .previewerMultiLineCode {
+.previewer .inlineCode, .previewer .previewerMultiLineCode {
   color: #ffffff;
   background: linear-gradient(160deg, #555, #000);
 }
 
-.preview .previewerTable td, .preview .previewerTable th, .preview .previewerTable {
+.previewer .previewerTable td, .previewer .previewerTable th, .previewer .previewerTable {
   border: 1px solid #000;
 }
 
@@ -48,34 +48,34 @@ body {
   box-shadow: 0 0 0.2em #9f9f9f;
 }
 
-.preview .previewerMainHeading {
+.previewer .previewerMainHeading {
   margin: 1.3em 0;
   font-size: 2.9em;
 }
-.preview .previewerSecondHeading {
+.previewer .previewerSecondHeading {
   margin: 1.3em 0;
   font-size: 2.1em;
 }
-.preview .previewerThirdHeading {
+.previewer .previewerThirdHeading {
   margin: 1.3em 0;
   font-size: 1.5717em;
 }
-.preview .previewerParagraph {
+.previewer .previewerParagraph {
   margin: 0.5em 0;
 }
-.preview .previewerMultiLineCode {
+.previewer .previewerMultiLineCode {
   padding: 1em;
   overflow-x: auto;
 }
-.preview .previewerBlockQuote {
+.previewer .previewerBlockQuote {
   padding-left: 0.5em;
   margin-left: 2em;
   border-left: 0.3em solid grey;
 }
-.preview .previewerImageWrapper .previewerImage {
+.previewer .previewerImageWrapper .previewerImage {
   width: 100%;
 }
-.preview .inlineCode {
+.previewer .inlineCode {
   padding: 0 0.2em;
 }
 
@@ -90,7 +90,7 @@ body {
   }
 }
 @media (min-width: 1000px) {
-  .preview, .editorWrapper {
+  .previewer, .editorWrapper {
     width: 50%;
     height: 90vh;
   }
@@ -121,7 +121,7 @@ body {
     max-width: 100em;
   }
 
-  .preview {
+  .previewer {
     overflow-y: auto;
     padding: 0 3em;
     box-shadow: 0 0 0.2em #9f9f9f;
