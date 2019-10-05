@@ -3,10 +3,9 @@
   padding: 0;
 }
 
-.preview .previewerUnorderedList, .preview .previewerOrderedList, .preview .previewerTable, .preview .previewerBlockQuote, .preview .previewerMultiLineCode, .preview .previewerParagraph {
+.preview .previewerImageWrapper, .preview > .previewerUnorderedList, .preview .previewerOrderedList, .preview .previewerTable, .preview .previewerBlockQuote, .preview .previewerMultiLineCode, .preview .previewerParagraph {
   font-size: 1.3em;
   margin: 1.3em 0;
-  width: 100%;
   box-sizing: border-box;
 }
 
@@ -68,11 +67,12 @@ body {
   padding: 1em;
   overflow-x: auto;
 }
-.preview .previewerUnorderedList {
-  font-size: 1rem;
-  margin: 0;
+.preview .previewerBlockQuote {
+  padding-left: 0.5em;
+  margin-left: 2em;
+  border-left: 0.3em solid grey;
 }
-.preview .previewerImage {
+.preview .previewerImageWrapper .previewerImage {
   width: 100%;
 }
 .preview .inlineCode {

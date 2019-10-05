@@ -5,10 +5,9 @@
   padding: $zero-padding;
 }
 
-%text-block {
+%block-element {
   font-size: $paragraph-font-size;
   margin: $block-element-margin;
-  width: $full-width;
   box-sizing: $border-box-sizing;
 }
 
@@ -65,20 +64,23 @@ body {
     font-size: $heading-font-size - 1.3283em;
   }
   .previewerParagraph {
-    @extend %text-block;
+    @extend %block-element;
     margin: $paragraph-margin;
   }
   .previewerMultiLineCode {
-    @extend %text-block;
+    @extend %block-element;
     @extend %code-style;
     padding: $block-code-padding;
     @include overflow(x, auto);
   }
   .previewerBlockQuote {
-    @extend %text-block;
+    @extend %block-element;
+    padding-left: $block-quote-left-padding;
+    margin-left: $block-quote-side-margin;
+    border-left: $block-quote-border;
   }
   .previewerTable {
-    @extend %text-block;
+    @extend %block-element;
     @extend %table-style;
 
     th {
@@ -90,16 +92,21 @@ body {
     }
   }
   .previewerOrderedList {
-    @extend %text-block;
+    @extend %block-element;
   }
-  .previewerUnorderedList {
-    @extend %text-block;
-    font-size: $list-font-size;
-    margin: $list-margin;
+
+  & > .previewerUnorderedList {
+    @extend %block-element;
   }
-  .previewerImage {
-    width: 100%;
+
+  .previewerImageWrapper {
+    @extend %block-element;
+
+    .previewerImage {
+      width: $full-width;
+    }
   }
+
   .inlineCode {
     @extend %code-style;
     padding: $inline-code-padding;
