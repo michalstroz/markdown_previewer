@@ -113,3 +113,45 @@ body {
   }
 }
 
+@media (min-width: 500px) {
+  .container {
+    font-size: $font-size + 1;
+  }
+}
+
+@media (min-width: 600px) {
+  .container {
+    font-size: $font-size + 2;
+  }
+}
+
+@media (min-width: 1000px) {
+  %set-content-children-dimensions {
+    width: $full-width - 50;
+    height: $full-screen-height - 10;
+
+  }
+
+  .container {
+    font-size: $font-size + 2.5;
+  }
+  .content {
+    @include flex-container(row, nowrap, center, flex-start, flex-start);
+    max-width: $max-content-width;
+  }
+  .editorWrapper {
+    @extend %set-content-children-dimensions;
+  }
+  .preview {
+    @extend %set-content-children-dimensions;
+    @include overflow(y, auto);
+    padding: $zero-padding $zero-padding + 3em;
+    box-shadow: $editor-shadow;
+  }
+}
+
+@media (min-width: 1300px) {
+  .content {
+    width: $full-width;
+  }
+}
