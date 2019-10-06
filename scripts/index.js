@@ -4,13 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const replacer = new Replacer();
 
     replacer.addBlockElementsToPrev(editor.value);
-    write(editor, replacer);
+    replacer.handleTypingInEditor(editor, replacer);
 });
-
-function write(input, obj) {
-    input.oninput = (e) => obj.addBlockElementsToPrev(e.target.value);
-}
-
 
 function Replacer() {
     this.preview = document.querySelector('#preview');
@@ -74,6 +69,10 @@ Replacer.prototype.divideTextToBlockElements = function (text) {
 
     this.arr = this.arr.filter(v => v.trim() !== '');
 
+};
+
+Replacer.prototype.handleTypingInEditor = function (input, obj) {
+    input.oninput = (e) => obj.addBlockElementsToPrev(e.target.value);
 };
 
 Replacer.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
