@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editor = document.querySelector('#editor');
     const replacer = new Replacer();
 
-    replacer.addBlockElementsToPrev(editor.value);
+    replacer.setElementsInPrev(editor.value);
     replacer.handleTypingInEditor(editor, replacer);
 });
 
@@ -72,7 +72,7 @@ Replacer.prototype.divideTextToBlockElements = function (text) {
 };
 
 Replacer.prototype.handleTypingInEditor = function (input, obj) {
-    input.oninput = (e) => obj.addBlockElementsToPrev(e.target.value);
+    input.oninput = (e) => obj.setElementsInPrev(e.target.value);
 };
 
 Replacer.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
@@ -110,7 +110,7 @@ Replacer.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
     return j;
 };
 
-Replacer.prototype.addBlockElementsToPrev = function (text) {
+Replacer.prototype.setElementsInPrev = function (text) {
 
     while (this.preview.firstChild) {
         this.preview.firstChild.remove();
