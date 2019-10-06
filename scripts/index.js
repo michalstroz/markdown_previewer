@@ -72,7 +72,7 @@ Replacer.prototype.divideTextToBlockElements = function (text) {
 };
 
 Replacer.prototype.handleTypingInEditor = function (input, obj) {
-    input.oninput = (e) => obj.setElementsInPrev(e.target.value);
+    input.addEventListener('keydown', (e) => obj.setElementsInPrev(e.target.value));
 };
 
 Replacer.prototype.addBlockToArr = function (arr, idx, loopArg = -1) {
