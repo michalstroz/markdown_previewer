@@ -1,15 +1,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const editor = document.querySelector('#editor');
-    const replacer = new Replacer();
+    const preview = document.querySelector('#preview');
+    const replacer = new Replacer(preview);
 
     replacer.setElementsInPrev(editor.value);
     replacer.handleTypingInEditor(editor, replacer);
 });
 
 class Replacer {
-    constructor() {
-        this.preview = document.querySelector('#preview');
+    constructor(preview) {
+        this.preview = preview;
         this.blockPatterns = {
             heading1: /^#.+$/,
             heading2: /^#{2}.+$/,
