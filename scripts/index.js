@@ -215,9 +215,9 @@ class Replacer {
     setUnorderedList(idx) {
         let strArr = this.arr[idx].split('\n').filter(v => v.trim() !== '');
         let i = 0;
-        const preview = this.preview;
+        const self = this;
 
-        (function createList(depth, parent = preview) {
+        (function createList(depth, parent = self.preview) {
             while (i < strArr.length) {
                 const [whiteSigns, data] = strArr[i].split('- ');
                 const whiteSignsLength = whiteSigns.length;
@@ -232,11 +232,11 @@ class Replacer {
                     const li = document.createElement('li');
                     const content = document.createTextNode(data);
                     li.appendChild(content);
-                    Replacer.prototype.setInlineElement(li);
+                    self.setInlineElement(li);
                     parent.appendChild(li);
                     i++;
                 } else {
-                    if (parent !== preview) {
+                    if (parent !== self.preview) {
                         parent = parent.lastChild;
                     }
 
@@ -316,6 +316,7 @@ class Replacer {
 
         element.innerHTML = txt;
     }
+
 }
 
 
