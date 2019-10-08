@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const replacer = new Replacer(preview);
 
     replacer.setElementsInPrev(editor.value);
-    replacer.handleTypingInEditor(editor, replacer);
+    replacer.handleTypingInEditor(editor);
 });
 
 class Replacer {
@@ -24,7 +24,7 @@ class Replacer {
 
         };
         this.divideTextPatterns = {
-            multilineCode: /^`{3}$/,
+            multilineCode: [/^`{3}$/, /`{3}/],
             orderedList: [/^\s*1\.\s+.+$/, /^(\s*(1\.|\*|-)\s+.+|\n)$/],
             unorderedList: [/^\s*-\s+.+$/, /^(\s*-\s+.+|\n)$/],
             table: [/^(\s*([-\s]+)(\|[-\s]+)+|\n)$/, /^(\s*(.+)(\|.+)+|\n)$/]
@@ -48,13 +48,17 @@ class Replacer {
         };
     }
 
+    handleTypingInEditor(input) {
+        input.addEventListener('input', (e) => this.setElementsInPrev(e.target.value));
+    }
+
     divideTextToBlockElements(text) {
         const array = text.match(/.+|\n+/g);
         let i = 0;
         this.arr = [];
 
         while (i < array.length) {
-            if (this.divideTextPatterns.multilineCode.test(array[i])) {
+            if (this.divideTextPatterns.multilineCode[0].test(array[i])) {
                 const lastIndex = array.indexOf('```', i + 1);
                 i = this.addBlockToArr(array, i, lastIndex);
             } else if (this.divideTextPatterns.orderedList[0].test(array[i])) {
@@ -71,10 +75,6 @@ class Replacer {
         this.arr = this.arr.filter(v => v.trim() !== '');
     }
 
-    handleTypingInEditor(input, obj) {
-        input.addEventListener('input', (e) => obj.setElementsInPrev(e.target.value));
-    }
-
     addBlockToArr(arr, idx, loopArg = -1) {
         const subArr = [arr[idx]];
         let j = idx + 1;
@@ -85,7 +85,8 @@ class Replacer {
                 j++
             }
             this.arr.push(subArr.join(''));
-        } else if (this.divideTextPatterns.table[0].test(arr[idx])) {
+        } else
+            if (this.divideTextPatterns.table[0].test(arr[idx])) {
             while (loopArg.test(arr[j])) {
                 subArr.push(arr[j]);
                 j++;
