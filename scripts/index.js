@@ -53,40 +53,35 @@ class Replacer {
     }
 
     divideTextToBlockElements(text) {
-        const array = text.match(/.+|\n+/g);
+        const array = text.split(/\n+/g);
         let i = 0;
         this.arr = [];
+        const patternsArr = Object.values(this.divideTextPatterns);
 
         while (i < array.length) {
-            if (this.divideTextPatterns.multilineCode[0].test(array[i])) {
-                const lastIndex = array.indexOf('```', i + 1);
-                i = this.addBlockToArr(array, i, lastIndex);
-            } else if (this.divideTextPatterns.orderedList[0].test(array[i])) {
-                i = this.addBlockToArr(array, i, this.divideTextPatterns.orderedList[1]);
-            } else if (this.divideTextPatterns.unorderedList[0].test(array[i])) {
-                i = this.addBlockToArr(array, i, this.divideTextPatterns.unorderedList[1]);
-            } else if (this.divideTextPatterns.table[0].test(array[i])) {
-                i = this.addBlockToArr(array, i, this.divideTextPatterns.table[1]);
+            const pattern = patternsArr.find((element) => element[0].test(array[i]));
+
+            if (pattern) {
+                i = this.addBlockToArr(array, i, pattern[1]);
             } else {
                 this.arr.push(array[i]);
                 i++;
             }
         }
-        this.arr = this.arr.filter(v => v.trim() !== '');
     }
 
-    addBlockToArr(arr, idx, loopArg = -1) {
+    addBlockToArr(arr, idx, loopArg) {
         const subArr = [arr[idx]];
         let j = idx + 1;
 
-        if (loopArg > -1) {
-            while (j <= loopArg) {
+        if (subArr[0].trim() === '```') {
+            const lastIndex = arr.indexOf('```', idx + 1);
+            while (j <= lastIndex) {
                 subArr.push(arr[j]);
                 j++
             }
-            this.arr.push(subArr.join(''));
-        } else
-            if (this.divideTextPatterns.table[0].test(arr[idx])) {
+            this.arr.push(subArr.join('\n'));
+        } else if (this.divideTextPatterns.table[0].test(arr[idx])) {
             while (loopArg.test(arr[j])) {
                 subArr.push(arr[j]);
                 j++;
@@ -94,7 +89,7 @@ class Replacer {
 
             if (this.divideTextPatterns.table[1].test(this.arr[this.arr.length - 1])) {
                 let str = this.arr[this.arr.length - 1];
-                str += subArr.join('');
+                str += '\n' + subArr.join('\n');
                 this.arr[this.arr.length - 1] = str;
             } else {
                 this.arr.push(subArr.join('\n'));
