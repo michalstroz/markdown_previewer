@@ -9,9 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 class Replacer {
-    constructor(preview) {
-        this.preview = preview;
-        this.blockPatterns = {
+    constructor(preview, options = {
+        blockPatterns: {
             heading1: /^#.+$/,
             heading2: /^#{2}.+$/,
             heading3: /^#{3}.+$/,
@@ -21,15 +20,14 @@ class Replacer {
             orderedList: /(\s*(1\.)\s+.+)(\s*(1\.|-|\*)\s+.+)+/,
             unorderedList: /^(\s*-\s+.+\s*)+$/,
             table: /((.+)(\|.+)+)\n(([-\s]+)(\|[-\s]+)+)(\n(.+)(\|.+)+)+/,
-
-        };
-        this.divideTextPatterns = {
+        },
+        divideTextPatterns: {
             multilineCode: [/^`{3}$/, /`{3}/],
             orderedList: [/^\s*1\.\s+.+$/, /^(\s*(1\.|\*|-)\s+.+|\n)$/],
             unorderedList: [/^\s*-\s+.+$/, /^(\s*-\s+.+|\n)$/],
             table: [/^(\s*([-\s]+)(\|[-\s]+)+|\n)$/, /^(\s*(.+)(\|.+)+|\n)$/]
-        };
-        this.classNames = {
+        },
+        classNames: {
             h1: 'previewerMainHeading',
             h2: 'previewerSecondHeading',
             h3: 'previewerThirdHeading',
@@ -45,7 +43,10 @@ class Replacer {
             i: 'previewerItalicText',
             del: 'previewerStrikethroughText',
             a: 'previewerLink'
-        };
+        }
+    }) {
+        this.preview = preview;
+        this.options = options;
     }
 
     handleTypingInEditor(input) {
@@ -56,7 +57,7 @@ class Replacer {
         const array = text.split(/\n+/g);
         let i = 0;
         this.arr = [];
-        const patternsArr = Object.values(this.divideTextPatterns);
+        const patternsArr = Object.values(this.options.divideTextPatterns);
 
         while (i < array.length) {
             const pattern = patternsArr.find((element) => element[0].test(array[i]));
@@ -81,20 +82,20 @@ class Replacer {
                 j++
             }
             this.arr.push(subArr.join('\n'));
-        } else if (this.divideTextPatterns.table[0].test(arr[idx])) {
+        } else if (this.options.divideTextPatterns.table[0].test(arr[idx])) {
             while (loopArg.test(arr[j])) {
                 subArr.push(arr[j]);
                 j++;
             }
 
-            if (this.divideTextPatterns.table[1].test(this.arr[this.arr.length - 1])) {
+            if (this.options.divideTextPatterns.table[1].test(this.arr[this.arr.length - 1])) {
                 let str = this.arr[this.arr.length - 1];
                 str += '\n' + subArr.join('\n');
                 this.arr[this.arr.length - 1] = str;
             } else {
                 this.arr.push(subArr.join('\n'));
             }
-        } else if (this.divideTextPatterns.orderedList[1].test(arr[idx]) || this.divideTextPatterns.unorderedList[1].test(arr[idx])) {
+        } else if (this.options.divideTextPatterns.orderedList[1].test(arr[idx]) || this.options.divideTextPatterns.unorderedList[1].test(arr[idx])) {
             while (loopArg.test(arr[j])) {
                 subArr.push(arr[j]);
                 j++;
@@ -112,23 +113,23 @@ class Replacer {
 
         this.divideTextToBlockElements(text);
         for (let i = 0; i < this.arr.length; i++) {
-            if (this.blockPatterns.heading3.test(this.arr[i])) {
+            if (this.options.blockPatterns.heading3.test(this.arr[i])) {
                 this.createBlockTxtElement(i, 'h3');
-            } else if (this.blockPatterns.heading2.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.heading2.test(this.arr[i])) {
                 this.createBlockTxtElement(i, 'h2');
-            } else if (this.blockPatterns.heading1.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.heading1.test(this.arr[i])) {
                 this.createBlockTxtElement(i, 'h1');
-            } else if (this.blockPatterns.blockQuote.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.blockQuote.test(this.arr[i])) {
                 this.createBlockTxtElement(i, 'blockquote');
-            } else if (this.blockPatterns.img.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.img.test(this.arr[i])) {
                 this.setImgElement(i);
-            } else if (this.blockPatterns.multilineCode.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.multilineCode.test(this.arr[i])) {
                 this.setBlockCode(i);
-            } else if (this.blockPatterns.orderedList.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.orderedList.test(this.arr[i])) {
                 this.setOrderedList(i);
-            } else if (this.blockPatterns.unorderedList.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.unorderedList.test(this.arr[i])) {
                 this.setUnorderedList(i);
-            } else if (this.blockPatterns.table.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.table.test(this.arr[i])) {
                 this.setTable(i);
             } else {
                 this.createBlockTxtElement(i, 'p');
@@ -151,7 +152,7 @@ class Replacer {
         }
 
         const content = document.createTextNode(str);
-        element.className = this.classNames[tag];
+        element.className = this.options.classNames[tag];
         element.id = 'previewerBlockElement-' + idx;
         element.appendChild(content);
         this.setInlineElement(element);
@@ -168,7 +169,7 @@ class Replacer {
         div.id = 'previewerBlockElement-' + idx;
 
         const img = document.createElement('img');
-        img.className = this.classNames['img'];
+        img.className = this.options.classNames['img'];
         img.src = src;
         img.alt = alt;
 
@@ -184,7 +185,7 @@ class Replacer {
         code.appendChild(content);
 
         const pre = document.createElement('pre');
-        pre.className = this.classNames['pre'];
+        pre.className = this.options.classNames['pre'];
         pre.id = 'previewerBlockElement-' +  idx;
         pre.appendChild(code);
         this.preview.appendChild(pre);
@@ -194,7 +195,7 @@ class Replacer {
         let str = this.arr[idx];
         const listArr = str.split('\n').filter(v => v.trim() !== '');
         const orderedList = document.createElement('ol');
-        orderedList.className = this.classNames['ol'];
+        orderedList.className = this.options.classNames['ol'];
         orderedList.id = 'previewerBlockElement-' + idx;
 
         listArr.forEach((v) => {
@@ -238,7 +239,7 @@ class Replacer {
                     }
 
                     const ul = document.createElement('ul');
-                    ul.className = 'previewerUnorderedList';
+                    ul.className = self.options['ul'];
                     createList(whiteSignsLength, ul);
                     parent.appendChild(ul);
                 }
@@ -249,7 +250,7 @@ class Replacer {
     setTable(idx) {
         const arr = this.arr[idx].split('\n');
         const table = document.createElement('table');
-        table.className = this.classNames['table'];
+        table.className = this.options.classNames['table'];
         table.id = 'previewerBlockElement-' + idx;
 
         for (let i = 0; i < arr.length; i++) {
@@ -315,5 +316,6 @@ class Replacer {
     }
 
 }
+
 
 
