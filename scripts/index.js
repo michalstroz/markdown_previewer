@@ -10,43 +10,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class Replacer {
     constructor(preview, options = {
-        blockPatterns: {
-            heading1: /^#.+$/,
-            heading2: /^#{2}.+$/,
-            heading3: /^#{3}.+$/,
-            blockQuote: /^>.*$/,
-            img: /!\[.*]\(.*\)/,
-            multilineCode: /`{3}\n+[\s\S]+?\n+`{3}/,
-            orderedList: /(\s*(1\.)\s+.+)(\s*(1\.|-|\*)\s+.+)+/,
-            unorderedList: /^(\s*-\s+.+\s*)+$/,
-            table: /((.+)(\|.+)+)\n(([-\s]+)(\|[-\s]+)+)(\n(.+)(\|.+)+)+/,
-        },
-        divideTextPatterns: {
-            multilineCode: [/^`{3}$/, /`{3}/],
-            orderedList: [/^\s*1\.\s+.+$/, /^(\s*(1\.|\*|-)\s+.+|\n)$/],
-            unorderedList: [/^\s*-\s+.+$/, /^(\s*-\s+.+|\n)$/],
-            table: [/^(\s*([-\s]+)(\|[-\s]+)+|\n)$/, /^(\s*(.+)(\|.+)+|\n)$/]
-        },
-        classNames: {
-            h1: 'previewerMainHeading',
-            h2: 'previewerSecondHeading',
-            h3: 'previewerThirdHeading',
-            blockquote: 'previewerBlockQuote',
-            img: 'previewerImage',
-            pre: 'previewerMultiLineCode',
-            ol: 'previewerOrderedList',
-            ul: 'previewerUnorderedList',
-            table: 'previewerTable',
-            p: 'previewerParagraph',
-            code: 'previewerInlineCode',
-            b: 'previewerBoldText',
-            i: 'previewerItalicText',
-            del: 'previewerStrikethroughText',
-            a: 'previewerLink'
-        }
-    }) {
+            blockPatterns: {
+                heading1: /^#.+$/,
+                heading2: /^#{2}.+$/,
+                heading3: /^#{3}.+$/,
+                blockQuote: /^>.*$/,
+                img: /!\[.*]\(.*\)/,
+                multilineCode: /`{3}\n+[\s\S]+?\n+`{3}/,
+                orderedList: /(\s*(1\.)\s+.+)(\s*(1\.|-|\*)\s+.+)+/,
+                unorderedList: /^(\s*-\s+.+\s*)+$/,
+                table: /((.+)(\|.+)+)\n(([-\s]+)(\|[-\s]+)+)(\n(.+)(\|.+)+)+/,
+            },
+            divideTextPatterns: {
+                multilineCode: [/^`{3}$/, /`{3}/],
+                orderedList: [/^\s*1\.\s+.+$/, /^(\s*(1\.|\*|-)\s+.+|\n)$/],
+                unorderedList: [/^\s*-\s+.+$/, /^(\s*-\s+.+|\n)$/],
+                table: [/^(\s*([-\s]+)(\|[-\s]+)+|\n)$/, /^(\s*(.+)(\|.+)+|\n)$/]
+            },
+            classNames: {
+                h1: 'previewerMainHeading',
+                h2: 'previewerSecondHeading',
+                h3: 'previewerThirdHeading',
+                blockquote: 'previewerBlockQuote',
+                img: 'previewerImage',
+                pre: 'previewerMultiLineCode',
+                ol: 'previewerOrderedList',
+                ul: 'previewerUnorderedList',
+                table: 'previewerTable',
+                p: 'previewerParagraph',
+                code: 'previewerInlineCode',
+                b: 'previewerBoldText',
+                i: 'previewerItalicText',
+                del: 'previewerStrikethroughText',
+                a: 'previewerLink'
+            },
+        }) {
         this.preview = preview;
         this.options = options;
+        this.dividedTextArr = [];
+        this.divideActions = new Map();
+        this.divideActions.set(this.options.divideTextPatterns.multilineCode[0], (idx) => {
+                const subArr = [this.dividedTextArr[idx]];
+                let j = idx + 1;
+                const lastIndex =this.dividedTextArr.indexOf('```', j);
+
+                while (j <= lastIndex) {
+                    subArr.push(this.dividedTextArr[j]);
+                    j++;
+                }
+                this.blockArr.push(subArr.join('\n'));
+                return j;
+        })
+            .set(this.options.divideTextPatterns.table[0], (idx) => {
+                const subArr = [this.dividedTextArr[idx]];
+                let j = idx + 1;
+
+                if (this.options.divideTextPatterns.table[1].test(this.blockArr[this.blockArr.length - 1])) {
+                    while (this.options.divideTextPatterns.table[1].test(this.dividedTextArr[j])) {
+                        subArr.push(this.dividedTextArr[j]);
+                        j++;
+                    }
+                    this.blockArr[this.blockArr.length - 1] = this.blockArr[this.blockArr.length - 1] + '\n' + subArr.join('\n');
+                } else {
+                    this.blockArr.push(subArr.join('\n'));
+                }
+                return j;
+        })
+            .set(this.options.divideTextPatterns.unorderedList[0], (idx) => this.loopThroughTextArr(this.options.divideTextPatterns.unorderedList[1], idx))
+            .set(this.options.divideTextPatterns.orderedList[0], (idx) => this.loopThroughTextArr(this.options.divideTextPatterns.orderedList[1], idx));
     }
 
     handleTypingInEditor(input) {
@@ -54,56 +85,34 @@ class Replacer {
     }
 
     divideTextToBlockElements(text) {
-        const array = text.split(/\n+/g);
+        this.dividedTextArr = text.split(/\n+/g);
         let i = 0;
-        this.arr = [];
+        this.blockArr = [];
         const patternsArr = Object.values(this.options.divideTextPatterns);
 
-        while (i < array.length) {
-            const pattern = patternsArr.find((element) => element[0].test(array[i]));
+        while (i < this.dividedTextArr.length) {
+            const pattern = patternsArr.find((element) => element[0].test(this.dividedTextArr[i]));
 
             if (pattern) {
-                i = this.addBlockToArr(array, i, pattern[1]);
+                i = this.divideActions.get(pattern[0])(i);
             } else {
-                this.arr.push(array[i]);
+                this.blockArr.push(this.dividedTextArr[i]);
                 i++;
             }
         }
     }
 
-    addBlockToArr(arr, idx, loopArg) {
-        const subArr = [arr[idx]];
+    loopThroughTextArr(pattern, idx) {
+        const subArr = [this.dividedTextArr[idx]];
         let j = idx + 1;
 
-        if (subArr[0].trim() === '```') {
-            const lastIndex = arr.indexOf('```', idx + 1);
-            while (j <= lastIndex) {
-                subArr.push(arr[j]);
-                j++
-            }
-            this.arr.push(subArr.join('\n'));
-        } else if (this.options.divideTextPatterns.table[0].test(arr[idx])) {
-            while (loopArg.test(arr[j])) {
-                subArr.push(arr[j]);
-                j++;
-            }
-
-            if (this.options.divideTextPatterns.table[1].test(this.arr[this.arr.length - 1])) {
-                let str = this.arr[this.arr.length - 1];
-                str += '\n' + subArr.join('\n');
-                this.arr[this.arr.length - 1] = str;
-            } else {
-                this.arr.push(subArr.join('\n'));
-            }
-        } else if (this.options.divideTextPatterns.orderedList[1].test(arr[idx]) || this.options.divideTextPatterns.unorderedList[1].test(arr[idx])) {
-            while (loopArg.test(arr[j])) {
-                subArr.push(arr[j]);
-                j++;
-            }
-            this.arr.push(subArr.join('\n'));
+        while (pattern.test(this.dividedTextArr[j])) {
+            subArr.push(this.dividedTextArr[j]);
+            j++;
         }
+        this.blockArr.push(subArr.join('\n'));
         return j;
-    };
+    }
 
     setElementsInPrev(text) {
 
@@ -112,24 +121,24 @@ class Replacer {
         }
 
         this.divideTextToBlockElements(text);
-        for (let i = 0; i < this.arr.length; i++) {
-            if (this.options.blockPatterns.heading3.test(this.arr[i])) {
+        for (let i = 0; i < this.blockArr.length; i++) {
+            if (this.options.blockPatterns.heading3.test(this.blockArr[i])) {
                 this.createBlockTxtElement(i, 'h3');
-            } else if (this.options.blockPatterns.heading2.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.heading2.test(this.blockArr[i])) {
                 this.createBlockTxtElement(i, 'h2');
-            } else if (this.options.blockPatterns.heading1.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.heading1.test(this.blockArr[i])) {
                 this.createBlockTxtElement(i, 'h1');
-            } else if (this.options.blockPatterns.blockQuote.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.blockQuote.test(this.blockArr[i])) {
                 this.createBlockTxtElement(i, 'blockquote');
-            } else if (this.options.blockPatterns.img.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.img.test(this.blockArr[i])) {
                 this.setImgElement(i);
-            } else if (this.options.blockPatterns.multilineCode.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.multilineCode.test(this.blockArr[i])) {
                 this.setBlockCode(i);
-            } else if (this.options.blockPatterns.orderedList.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.orderedList.test(this.blockArr[i])) {
                 this.setOrderedList(i);
-            } else if (this.options.blockPatterns.unorderedList.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.unorderedList.test(this.blockArr[i])) {
                 this.setUnorderedList(i);
-            } else if (this.options.blockPatterns.table.test(this.arr[i])) {
+            } else if (this.options.blockPatterns.table.test(this.blockArr[i])) {
                 this.setTable(i);
             } else {
                 this.createBlockTxtElement(i, 'p');
@@ -139,7 +148,7 @@ class Replacer {
 
     createBlockTxtElement(idx, tag) {
         const element = document.createElement(tag);
-        let str = this.arr[idx];
+        let str = this.blockArr[idx];
 
         if (tag === 'h1') {
             str = str.slice(1).trim();
@@ -160,7 +169,7 @@ class Replacer {
     };
 
     setImgElement(idx) {
-        const str = this.arr[idx];
+        const str = this.blockArr[idx];
         const src = str.slice(str.indexOf('(') + 1, str.indexOf(')')).trim();
         const alt = str.slice(str.indexOf('[') + 1, str.indexOf(']')).trim();
 
@@ -178,7 +187,7 @@ class Replacer {
     };
 
     setBlockCode(idx) {
-        let str = this.arr[idx];
+        let str = this.blockArr[idx];
         str = str.slice(3, str.length - 3).trim();
         const content = document.createTextNode(str);
         const code = document.createElement('code');
@@ -192,7 +201,7 @@ class Replacer {
     };
 
     setOrderedList(idx) {
-        let str = this.arr[idx];
+        let str = this.blockArr[idx];
         const listArr = str.split('\n').filter(v => v.trim() !== '');
         const orderedList = document.createElement('ol');
         orderedList.className = this.options.classNames['ol'];
@@ -211,7 +220,7 @@ class Replacer {
     };
 
     setUnorderedList(idx) {
-        let strArr = this.arr[idx].split('\n').filter(v => v.trim() !== '');
+        let strArr = this.blockArr[idx].split('\n').filter(v => v.trim() !== '');
         let i = 0;
         const self = this;
 
@@ -239,7 +248,7 @@ class Replacer {
                     }
 
                     const ul = document.createElement('ul');
-                    ul.className = self.options['ul'];
+                    ul.className = self.options.classNames['ul'];
                     createList(whiteSignsLength, ul);
                     parent.appendChild(ul);
                 }
@@ -248,7 +257,7 @@ class Replacer {
     };
 
     setTable(idx) {
-        const arr = this.arr[idx].split('\n');
+        const arr = this.blockArr[idx].split('\n');
         const table = document.createElement('table');
         table.className = this.options.classNames['table'];
         table.id = 'previewerBlockElement-' + idx;
