@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 class Replacer {
     constructor(preview, options = {
             blockPatterns: {
-                heading1: /^#.+$/,
-                heading2: /^#{2}.+$/,
                 heading3: /^#{3}.+$/,
+                heading2: /^#{2}.+$/,
+                heading1: /^#.+$/,
                 blockQuote: /^>.*$/,
                 img: /!\[.*]\(.*\)/,
                 multilineCode: /`{3}\n+[\s\S]+?\n+`{3}/,
@@ -76,8 +76,18 @@ class Replacer {
                 }
                 return j;
         })
-            .set(this.options.divideTextPatterns.unorderedList[0], (idx) => this.loopThroughTextArr(this.options.divideTextPatterns.unorderedList[1], idx))
-            .set(this.options.divideTextPatterns.orderedList[0], (idx) => this.loopThroughTextArr(this.options.divideTextPatterns.orderedList[1], idx));
+            .set(this.options.divideTextPatterns.unorderedList[0], (idx) => this.addTextToArrAsBlockElement(this.options.divideTextPatterns.unorderedList[1], idx))
+            .set(this.options.divideTextPatterns.orderedList[0], (idx) => this.addTextToArrAsBlockElement(this.options.divideTextPatterns.orderedList[1], idx));
+        this.markdownMap = new Map();
+        this.markdownMap.set(this.options.blockPatterns.heading3, (idx, tag = 'h3') => this.createBlockTxtElement(idx, tag));
+        this.markdownMap.set(this.options.blockPatterns.heading2, (idx, tag = 'h2') => this.createBlockTxtElement(idx, tag));
+        this.markdownMap.set(this.options.blockPatterns.heading1, (idx, tag = 'h1') => this.createBlockTxtElement(idx, tag));
+        this.markdownMap.set(this.options.blockPatterns.blockQuote, (idx, tag = 'blockquote') => this.createBlockTxtElement(idx, tag));
+        this.markdownMap.set(this.options.blockPatterns.img, (idx) => this.setImgElement(idx));
+        this.markdownMap.set(this.options.blockPatterns.multilineCode, (idx) => this.setBlockCode(idx));
+        this.markdownMap.set(this.options.blockPatterns.orderedList, (idx) => this.setOrderedList(idx));
+        this.markdownMap.set(this.options.blockPatterns.unorderedList, (idx) => this.setUnorderedList(idx));
+        this.markdownMap.set(this.options.blockPatterns.table, (idx) => this.setTable(idx));
     }
 
     handleTypingInEditor(input) {
@@ -102,7 +112,7 @@ class Replacer {
         }
     }
 
-    loopThroughTextArr(pattern, idx) {
+    addTextToArrAsBlockElement(pattern, idx) {
         const subArr = [this.dividedTextArr[idx]];
         let j = idx + 1;
 
@@ -115,31 +125,18 @@ class Replacer {
     }
 
     setElementsInPrev(text) {
-
         while (this.preview.firstChild) {
             this.preview.firstChild.remove();
         }
 
         this.divideTextToBlockElements(text);
+        const patternsArr = Object.values(this.options.blockPatterns);
+
         for (let i = 0; i < this.blockArr.length; i++) {
-            if (this.options.blockPatterns.heading3.test(this.blockArr[i])) {
-                this.createBlockTxtElement(i, 'h3');
-            } else if (this.options.blockPatterns.heading2.test(this.blockArr[i])) {
-                this.createBlockTxtElement(i, 'h2');
-            } else if (this.options.blockPatterns.heading1.test(this.blockArr[i])) {
-                this.createBlockTxtElement(i, 'h1');
-            } else if (this.options.blockPatterns.blockQuote.test(this.blockArr[i])) {
-                this.createBlockTxtElement(i, 'blockquote');
-            } else if (this.options.blockPatterns.img.test(this.blockArr[i])) {
-                this.setImgElement(i);
-            } else if (this.options.blockPatterns.multilineCode.test(this.blockArr[i])) {
-                this.setBlockCode(i);
-            } else if (this.options.blockPatterns.orderedList.test(this.blockArr[i])) {
-                this.setOrderedList(i);
-            } else if (this.options.blockPatterns.unorderedList.test(this.blockArr[i])) {
-                this.setUnorderedList(i);
-            } else if (this.options.blockPatterns.table.test(this.blockArr[i])) {
-                this.setTable(i);
+            const pattern = patternsArr.find((el) => el.test(this.blockArr[i]));
+
+            if (pattern) {
+                this.markdownMap.get(pattern)(i);
             } else {
                 this.createBlockTxtElement(i, 'p');
             }
